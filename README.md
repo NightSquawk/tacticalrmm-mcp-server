@@ -1,5 +1,7 @@
 # @nightsquawktech/tacticalrmm-mcp-server
 
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/NightSquawk/tacticalrmm-mcp-server/badge)](https://scorecard.dev/viewer/?uri=github.com/NightSquawk/tacticalrmm-mcp-server)
+
 Simple Model Context Protocol server for self-hosted TacticalRMM instances.
 
 ## Feasibility
