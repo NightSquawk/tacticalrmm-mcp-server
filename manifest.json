@@ -1,0 +1,86 @@
+{
+  "manifest_version": "0.4",
+  "name": "tacticalrmm-mcp-server",
+  "display_name": "TacticalRMM MCP Server",
+  "version": "0.1.0",
+  "description": "MCP server for self-hosted TacticalRMM instances.",
+  "long_description": "Connect Claude to your self-hosted [TacticalRMM](https://tacticalrmm.com) instance. 22 read-only tools covering agents, checks, alerts, tasks, services, software, Windows updates, pending actions, clients, sites, policies, scripts, and audit logs. No write operations: safe to point at production.",
+  "author": {
+    "name": "NightSquawk Tech",
+    "email": "hello@nightsquawk.tech",
+    "url": "https://nightsquawk.tech"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NightSquawk/tacticalrmm-mcp-server"
+  },
+  "homepage": "https://github.com/NightSquawk/tacticalrmm-mcp-server",
+  "documentation": "https://github.com/NightSquawk/tacticalrmm-mcp-server#readme",
+  "support": "https://github.com/NightSquawk/tacticalrmm-mcp-server/issues",
+  "server": {
+    "type": "node",
+    "entry_point": "dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/index.js"],
+      "env": {
+        "TACTICALRMM_BASE_URL": "${user_config.base_url}",
+        "TACTICALRMM_API_KEY": "${user_config.api_key}",
+        "TACTICALRMM_TIMEOUT_MS": "${user_config.timeout_ms}"
+      }
+    }
+  },
+  "user_config": {
+    "base_url": {
+      "type": "string",
+      "title": "TacticalRMM API Base URL",
+      "description": "Your TacticalRMM API URL, for example https://api.yourdomain.com",
+      "required": true
+    },
+    "api_key": {
+      "type": "string",
+      "title": "API Key",
+      "description": "Create one in TacticalRMM under Settings > Global Settings > API Keys",
+      "sensitive": true,
+      "required": true
+    },
+    "timeout_ms": {
+      "type": "number",
+      "title": "Request Timeout (ms)",
+      "description": "HTTP timeout for TacticalRMM API requests, minimum 1000",
+      "default": 30000,
+      "min": 1000,
+      "required": false
+    }
+  },
+  "tools": [
+    { "name": "tacticalrmm_get_server_info", "description": "TacticalRMM server version and info" },
+    { "name": "tacticalrmm_list_clients", "description": "List clients" },
+    { "name": "tacticalrmm_list_sites", "description": "List sites" },
+    { "name": "tacticalrmm_list_agents", "description": "List agents with filters" },
+    { "name": "tacticalrmm_get_agent", "description": "Get one agent's details" },
+    { "name": "tacticalrmm_list_agent_checks", "description": "Checks on an agent" },
+    { "name": "tacticalrmm_list_agent_tasks", "description": "Automated tasks on an agent" },
+    { "name": "tacticalrmm_list_agent_services", "description": "Windows services on an agent" },
+    { "name": "tacticalrmm_list_agent_software", "description": "Installed software on an agent" },
+    { "name": "tacticalrmm_list_agent_notes", "description": "Notes on an agent" },
+    { "name": "tacticalrmm_list_agent_history", "description": "Command/script history for an agent" },
+    { "name": "tacticalrmm_list_agent_pending_actions", "description": "Pending actions for an agent" },
+    { "name": "tacticalrmm_list_win_updates", "description": "Windows updates for an agent" },
+    { "name": "tacticalrmm_list_checks", "description": "List checks across agents" },
+    { "name": "tacticalrmm_get_check_history", "description": "History datapoints for a check" },
+    { "name": "tacticalrmm_list_alerts", "description": "List alerts with filters" },
+    { "name": "tacticalrmm_list_tasks", "description": "List automated tasks" },
+    { "name": "tacticalrmm_list_policies", "description": "List automation policies" },
+    { "name": "tacticalrmm_list_scripts", "description": "List scripts" },
+    { "name": "tacticalrmm_list_pending_actions", "description": "Pending actions across all agents" },
+    { "name": "tacticalrmm_get_custom_fields", "description": "Custom field definitions" },
+    { "name": "tacticalrmm_get_audit_logs", "description": "Query audit logs" }
+  ],
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": { "node": ">=20" }
+  },
+  "keywords": ["tacticalrmm", "rmm", "msp", "mcp", "monitoring", "it-management"],
+  "license": "AGPL-3.0-only"
+}
