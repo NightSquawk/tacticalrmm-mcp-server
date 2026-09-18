@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { SERVER_NAME, SERVER_VERSION } from "./constants.js";
+import { ENV, SERVER_NAME, SERVER_VERSION } from "./constants.js";
 import { loadConfig } from "./services/config.js";
 import { TacticalRmmClient } from "./services/tacticalrmm-client.js";
 import { registerTools } from "./tools/index.js";
@@ -22,6 +22,18 @@ async function main(): Promise<void> {
 }
 
 main().catch((error: unknown) => {
-  console.error(error instanceof Error ? error.message : String(error));
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`${SERVER_NAME} failed to start: ${redactSecrets(message)}`);
   process.exit(1);
 });
+
+// Defense in depth: a startup failure should never be able to echo the
+// configured TacticalRMM API key back out, even if some upstream error
+// (ours or a dependency's) happened to interpolate it into a message.
+function redactSecrets(message: string): string {
+  const apiKey = process.env[ENV.apiKey];
+  if (!apiKey) {
+    return message;
+  }
+  return message.split(apiKey).join("[REDACTED]");
+}
