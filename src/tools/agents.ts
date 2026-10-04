@@ -91,7 +91,9 @@ export function registerAgentTools(server: McpServer, client: TacticalRmmClient)
     },
     async ({ agent_id, response_format }: AgentIdInput) => {
       try {
-        const software = await client.get<unknown[]>(`/software/${encodeURIComponent(agent_id)}/`);
+        const raw = await client.get<unknown[] | { software?: unknown[] }>(`/software/${encodeURIComponent(agent_id)}/`);
+        // /software/<id>/ returns { id, agent, software: [...] }, or a bare [] when the agent has no record.
+        const software: unknown[] = Array.isArray(raw) ? raw : Array.isArray(raw?.software) ? raw.software : [];
         const data = {
           agent_id,
           total: software.length,
