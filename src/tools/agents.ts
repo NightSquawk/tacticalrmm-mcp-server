@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { TacticalRmmClient } from "../services/tacticalrmm-client.js";
 import { AgentIdSchema, ListAgentsSchema, type AgentIdInput, type ListAgentsInput } from "../schemas/agents.js";
+import { AgentResourceSchema, type AgentResourceInput } from "../schemas/resources.js";
 import { formatApiError } from "../services/errors.js";
 import { formatResponse, makeToolResponse, paginate, summarizeRecord } from "./format.js";
 
@@ -80,8 +81,8 @@ export function registerAgentTools(server: McpServer, client: TacticalRmmClient)
     "tacticalrmm_list_agent_software",
     {
       title: "List TacticalRMM Agent Software",
-      description: "List software inventory for a TacticalRMM agent from /software/<agent_id>/. This tool is read-only.",
-      inputSchema: AgentIdSchema.shape,
+      description: "List software inventory for a TacticalRMM agent from /software/<agent_id>/, paginated with limit and offset. This tool is read-only.",
+      inputSchema: AgentResourceSchema.shape,
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,
@@ -89,22 +90,22 @@ export function registerAgentTools(server: McpServer, client: TacticalRmmClient)
         openWorldHint: true
       }
     },
-    async ({ agent_id, response_format }: AgentIdInput) => {
+    async ({ agent_id, limit, offset, response_format }: AgentResourceInput) => {
       try {
         const raw = await client.get<unknown[] | { software?: unknown[] }>(`/software/${encodeURIComponent(agent_id)}/`);
         // /software/<id>/ returns { id, agent, software: [...] }, or a bare [] when the agent has no record.
         const software: unknown[] = Array.isArray(raw) ? raw : Array.isArray(raw?.software) ? raw.software : [];
         const data = {
           agent_id,
-          total: software.length,
-          software
+          ...paginate(software, limit, offset)
         };
         const markdown = [
           "# TacticalRMM Agent Software",
           "",
-          `Found ${software.length} software records for ${agent_id}.`,
+          `Showing ${data.count} of ${data.total} software records for ${agent_id}.`,
+          ...(data.has_more ? [`More records available: call again with offset ${data.next_offset}.`] : []),
           "",
-          ...software.slice(0, 100).map((item) => `- ${summarizeRecord(item, ["name", "version", "publisher", "install_date"])}`)
+          ...data.items.map((item) => `- ${summarizeRecord(item, ["name", "version", "publisher", "install_date"])}`)
         ].join("\n");
 
         return makeToolResponse(data, formatResponse(response_format, data, markdown));
