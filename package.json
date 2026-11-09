@@ -1,6 +1,6 @@
 {
   "name": "@nightsquawktech/tacticalrmm-mcp-server",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "TacticalRMM MCP server for Claude, Cursor, and AI agents: 22 read-only tools covering agents, checks, alerts, tasks, software, updates, and audit logs.",
   "keywords": [
     "mcp",
